@@ -1,0 +1,19 @@
+[project]
+name = "project-evaluation"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.116.1",
+    "google-genai>=1.28.0",
+    "llama-index>=0.13.0",
+    "llama-index-embeddings-google-genai>=0.3.0",
+    "llama-index-vector-stores-qdrant>=0.7.1",
+    "pydantic-settings>=2.10.1",
+    "pymupdf4llm>=0.0.27",
+    "python-dotenv>=1.1.1",
+    "python-multipart>=0.0.20",
+    "qdrant-client>=1.15.1",
+    "uvicorn>=0.35.0",
+]
