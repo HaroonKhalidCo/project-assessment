@@ -42,36 +42,59 @@ class GeminiDocEvaluator:
                 
             # 2. Upload file asynchronously with retry and wait for processing
             max_retries = 3
-            retry_delay = 2  # seconds
-            max_processing_time = 30  # Maximum time to wait for processing (seconds)
+            retry_delay = 5  # Increased initial delay for video files
+            max_processing_time = 120  # Increased max processing time to 2 minutes for videos
             
             for attempt in range(max_retries):
                 try:
-                    # Upload the file
-                    myfile = await loop.run_in_executor(
-                        None, 
-                        lambda: self.client.files.upload(file=file_path)
-                    )
-                    
-                    if not hasattr(myfile, 'state'):
-                        # If state isn't available, assume it's ready
-                        break
-                        
-                    # Wait for the file to be processed
-                    start_time = asyncio.get_event_loop().time()
-                    while myfile.state == 'PROCESSING':
-                        if (asyncio.get_event_loop().time() - start_time) > max_processing_time:
-                            raise Exception(f"File processing timed out after {max_processing_time} seconds")
-                        await asyncio.sleep(retry_delay)
-                        
-                        # Refresh file status
-                        myfile = await loop.run_in_executor(
-                            None,
-                            lambda: self.client.files.get(name=myfile.name)
+                    # Upload the file with timeout
+                    try:
+                        myfile = await asyncio.wait_for(
+                            loop.run_in_executor(
+                                None, 
+                                lambda: self.client.files.upload(file=file_path)
+                            ),
+                            timeout=60  # 60 seconds timeout for upload
                         )
-                    
-                    if myfile.state != 'ACTIVE':
-                        raise Exception(f"File is not in ACTIVE state after upload. State: {myfile.state}")
+                        
+                        if not hasattr(myfile, 'state') or not hasattr(myfile, 'name'):
+                            # If state/name isn't available, assume it's ready
+                            break
+                            
+                        # Wait for the file to be processed
+                        start_time = asyncio.get_event_loop().time()
+                        last_state = None
+                        
+                        while True:
+                            # Refresh file status
+                            myfile = await asyncio.wait_for(
+                                loop.run_in_executor(
+                                    None,
+                                    lambda: self.client.files.get(name=myfile.name)
+                                ),
+                                timeout=30  # 30 seconds timeout for status check
+                            )
+                            
+                            current_state = getattr(myfile, 'state', 'UNKNOWN')
+                            
+                            # Log state changes
+                            if current_state != last_state:
+                                print(f"File state: {current_state}")
+                                last_state = current_state
+                            
+                            if current_state == 'ACTIVE':
+                                break
+                            elif current_state == 'FAILED':
+                                raise Exception(f"File processing failed. State: {current_state}")
+                            elif current_state == 'PROCESSING':
+                                if (asyncio.get_event_loop().time() - start_time) > max_processing_time:
+                                    raise Exception(f"File processing timed out after {max_processing_time} seconds")
+                                await asyncio.sleep(retry_delay)
+                            else:
+                                # For any other state, wait and check again
+                                await asyncio.sleep(retry_delay)
+                    except asyncio.TimeoutError:
+                        raise Exception("File upload or status check timed out. Please try again.")
                         
                     break  # Success, exit retry loop
                     
