@@ -117,10 +117,10 @@ You will be given a document (such as a research report, code summary, branding 
 6. Be objective, detailed, and clear in your scoring.
 7. Output format must follow this structure for each section:
 
-### Evaluation: \[Rubric Name]
+### Evaluation: \\[Rubric Name\\]
 
-* Criterion: \[Your evaluation and score]
-* Final Scores: \[Total or per criterion]
+* Criterion: \\[Your evaluation and score\\]
+* Final Scores: \\[Total or per criterion\\]
 * Strengths, Weeknes, Improvements etc (Be detailed)
 
 
