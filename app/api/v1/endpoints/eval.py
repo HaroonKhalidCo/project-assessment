@@ -1,19 +1,13 @@
 # FastAPI endpoint for document and media evaluation
-from fastapi import APIRouter, UploadFile, File, HTTPException, status, Depends, Request
+from fastapi import APIRouter, UploadFile, File, HTTPException, status, Depends
 from fastapi.responses import JSONResponse
 import tempfile
 import shutil
 import os
-import logging
-import traceback
 from typing import List, Optional
 from app.services.project_doc import GeminiDocEvaluator
 from app.prompts import system_prompt
 from app.api.v1.schemas.eval import EvaluationResponse, EvaluationRequest
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["evaluation"])
 
@@ -35,15 +29,11 @@ def is_allowed_file(filename: str) -> bool:
 
 @router.post("/evaluate", response_model=EvaluationResponse, status_code=status.HTTP_200_OK)
 async def evaluate_document(
-    request: Request,
     file: UploadFile = File(..., description="The file to evaluate"),
     step_name: str = "",
     deliverable_name: str = "",
     additional_context: Optional[str] = None
 ):
-    logger.info(f"Received evaluation request for step: {step_name}, deliverable: {deliverable_name}")
-    logger.info(f"File details - name: {file.filename}, content_type: {file.content_type}, size: {file.size}")
-    
     """
     Evaluate a document, image, audio, or video file for a specific step and deliverable.
     
@@ -156,17 +146,10 @@ async def evaluate_document(
         error_detail = str(e)
         status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         
-        # Log the full error with traceback
-        logger.error(f"Error processing evaluation: {str(e)}")
-        logger.error(f"Traceback: {traceback.format_exc()}")
-        
         # Handle specific Gemini API errors
         if "FAILED_PRECONDITION" in error_detail or "not in an ACTIVE state" in error_detail:
             status_code = status.HTTP_400_BAD_REQUEST
             error_detail = "The uploaded file could not be processed. Please try again with a different file."
-        elif "File is not in ACTIVE state" in error_detail:
-            status_code = status.HTTP_408_REQUEST_TIMEOUT
-            error_detail = "File processing is taking longer than expected. Please try again in a moment."
         
         raise HTTPException(
             status_code=status_code,

@@ -1,0 +1,40 @@
+2025-08-08 19:25:43,044 - app.api.v1.endpoints.eval - INFO - [5e45fd3b] Starting evaluation request
+2025-08-08 19:25:43,044 - app.api.v1.endpoints.eval - INFO - [5e45fd3b] Step: AI developement, Deliverable: demo video
+2025-08-08 19:25:43,044 - app.api.v1.endpoints.eval - INFO - [5e45fd3b] File: Generated File August 06, 2025 - 6_31PM.mp4, Type: video/mp4
+2025-08-08 19:25:43,050 - app.api.v1.endpoints.eval - INFO - [5e45fd3b] File saved to temporary location: /tmp/tmpex4x65de.mp4
+2025-08-08 19:25:43,050 - app.services.project_doc - ERROR - GEMINI_API_KEY environment variable is not set
+2025-08-08 19:25:43,051 - app.services.project_doc - ERROR - Failed to initialize Gemini client: GEMINI_API_KEY environment variable is required
+Traceback (most recent call last):
+  File "/home/moeez/Documents/Early-Age-Development/Backend-Code/EAD-Project-Evaluation-Backend/app/services/project_doc.py", line 21, in __init__
+    raise ValueError("GEMINI_API_KEY environment variable is required")
+ValueError: GEMINI_API_KEY environment variable is required
+
+2025-08-08 19:25:43,051 - app.api.v1.endpoints.eval - ERROR - [5e45fd3b] Error during evaluation: GEMINI_API_KEY environment variable is required
+2025-08-08 19:25:43,051 - app.api.v1.endpoints.eval - ERROR - [5e45fd3b] Error during evaluation: 500: {'error': 'evaluation_failed', 'message': 'Evaluation failed: GEMINI_API_KEY environment variable is required', 'step': 'AI developement'}
+2025-08-08 19:25:43,051 - app.api.v1.endpoints.eval - INFO - [5e45fd3b] Temporary file removed
+2025-08-08 19:25:43,052 - app.api.v1.endpoints.eval - ERROR - [5e45fd3b] HTTP Exception: {'error': 'evaluation_failed', 'message': "Evaluation failed: 500: {'error': 'evaluation_failed', 'message': 'Evaluation failed: GEMINI_API_KEY environment variable is required', 'step': 'AI developement'}", 'step': 'AI developement', 'deliverable': 'demo video', 'request_id': '5e45fd3b'}
+Traceback (most recent call last):
+  File "/home/moeez/Documents/Early-Age-Development/Backend-Code/EAD-Project-Evaluation-Backend/app/api/v1/endpoints/eval.py", line 136, in evaluate_document
+    evaluator = GeminiDocEvaluator()
+  File "/home/moeez/Documents/Early-Age-Development/Backend-Code/EAD-Project-Evaluation-Backend/app/services/project_doc.py", line 21, in __init__
+    raise ValueError("GEMINI_API_KEY environment variable is required")
+ValueError: GEMINI_API_KEY environment variable is required
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/moeez/Documents/Early-Age-Development/Backend-Code/EAD-Project-Evaluation-Backend/app/api/v1/endpoints/eval.py", line 165, in evaluate_document
+    raise HTTPException(
+    ...<6 lines>...
+    )
+fastapi.exceptions.HTTPException: 500: {'error': 'evaluation_failed', 'message': 'Evaluation failed: GEMINI_API_KEY environment variable is required', 'step': 'AI developement'}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/moeez/Documents/Early-Age-Development/Backend-Code/EAD-Project-Evaluation-Backend/app/api/v1/endpoints/eval.py", line 176, in evaluate_document
+    raise HTTPException(
+    ...<8 lines>...
+    )
+fastapi.exceptions.HTTPException: 500: {'error': 'evaluation_failed', 'message': "Evaluation failed: 500: {'error': 'evaluation_failed', 'message': 'Evaluation failed: GEMINI_API_KEY environment variable is required', 'step': 'AI developement'}", 'step': 'AI developement', 'deliverable': 'demo video', 'request_id': '5e45fd3b'}
+
